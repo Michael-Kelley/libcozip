@@ -8,7 +8,7 @@ namespace COZip {
 	public static class COZip {
 		public const int CHUNK = 16384;
 
-		public static void Deflate(Stream source, Stream dest, uint xor, int level) {
+		public static void Deflate(Stream source, Stream dest, uint xor = 0x57676592, int level = 9) {
 			int ret, flush;
 			var length = (uint)source.Length;
 			var writer = new BinaryWriter(dest);
@@ -16,10 +16,11 @@ namespace COZip {
 
 			writer.Write(length);
 
-			var zs = new ZStream();
-			zs.ZAlloc = IntPtr.Zero;
-			zs.ZFree = IntPtr.Zero;
-			zs.Opaque = IntPtr.Zero;
+			var zs = new ZStream {
+				ZAlloc = IntPtr.Zero,
+				ZFree = IntPtr.Zero,
+				Opaque = IntPtr.Zero
+			};
 
 			var size = Marshal.SizeOf(zs);
 			ret = DeflateInit2(
@@ -37,7 +38,7 @@ namespace COZip {
 				throw new Exception(err);
 			}
 
-			IntPtr outd = Marshal.AllocHGlobal(CHUNK);
+			var outd = Marshal.AllocHGlobal(CHUNK);
 
 			int i = 0;
 
@@ -85,7 +86,7 @@ namespace COZip {
 			writer.Flush();
 		}
 
-		public static void Inflate(Stream source, Stream dest, uint xor) {
+		public static void Inflate(Stream source, Stream dest, uint xor = 0x57676592) {
 			uint have;
 
 			var reader = new BinaryReader(source);
@@ -103,7 +104,7 @@ namespace COZip {
 				throw new Exception(err);
 			}
 
-			IntPtr outd = Marshal.AllocHGlobal(CHUNK);
+			var outd = Marshal.AllocHGlobal(CHUNK);
 
 			int i = 0;
 
