@@ -16,12 +16,7 @@ namespace COZip.Tool {
 			foreach (var a in args) {
 				var ext = Path.GetExtension(a);
 
-				if (ext == ".xml" || ext == ".bin")
-					using (var inf = File.OpenRead(a)) {
-						using (var outf = File.Create($"{Path.GetFileNameWithoutExtension(a)}.enc"))
-							COZip.Deflate(inf, outf, xor);
-					}
-				else
+				if (ext == ".enc")
 					using (var inf = File.OpenRead(a)) {
 						using (var ms = new MemoryStream()) {
 							COZip.Inflate(inf, ms, xor);
@@ -41,6 +36,11 @@ namespace COZip.Tool {
 							using (var outf = File.Create($"{Path.GetFileNameWithoutExtension(a)}{ext}"))
 								ms.WriteTo(outf);
 						}
+					}
+				else
+					using (var inf = File.OpenRead(a)) {
+						using (var outf = File.Create($"{Path.GetFileNameWithoutExtension(a)}.enc"))
+							COZip.Deflate(inf, outf, xor);
 					}
 			}
 		}
